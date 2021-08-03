@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 9/28/20
-#
+#!/bin/bash
 # Builds a customized divider
 #
 # +--------------------- Example Divider ---------------------+
@@ -11,8 +8,7 @@ include "print"
 
 div() {
   # Exits if printPermission is set to quiet
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -50,108 +46,108 @@ div() {
       ;;
       -opl|--outerPaddingLeft)
         outerPaddingLeft=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -opr|--outerPaddingRight)
         outerPaddingRight=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -oe|--outerEdges)
         outerEdgeLeft="$2"
         outerEdgeRight="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -oel|--outerEdgeLeft)
         outerEdgeLeft="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -oer|--outerEdgeRight)
         outerEdgeRight="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -a|--arms)
         leftArm="$2"
         rightArm="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -la|--leftArm)
         leftArm="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ra|--rightArm)
         rightArm="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ie|--innerEdge)
         innerEdgeLeft="$2"
         innerEdgeRight="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -iel|--innerEdgeLeft)
         innerEdgeLeft="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ier|--innerEdgeRight)
         innerEdgeRight="$2"
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ip|--innerPadding)
         innerPaddingLeft=$2
         innerPaddingRight=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ipl|--innerPaddingLeft)
         innerPaddingLeft=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -ipr|--innerPaddingRight)
         innerPaddingRight=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -j|--justify)
         justify=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -vp|--verticalPadding)
         upperPadding=$2
         lowerPadding=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -up|--upperPadding)
         upperPadding=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -lp|--lowerPadding)
         lowerPadding=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -w|--width)
         width=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -h|--height)
         height=$2
-        shift 
-        shift 
+        shift
+        shift
       ;;
       -n|--noNewLine)
         newLine=0
@@ -167,7 +163,7 @@ div() {
           text+="$1 "
           shift
         done
-        
+
         text=$(echo $text | sed 's/ *$//g')
       ;;
     esac
@@ -189,17 +185,15 @@ div() {
 
   # Reconciles width with width of contents
   contentWidth=$(($outerPaddingLeft + ${#outerEdgeLeft} + ${#innerEdgeLeft} + $innerPaddingLeft + ${#text} + $innerPaddingRight + ${#innerEdgeLeft} + ${#outerEdgeRight} + $outerPaddingRight))
-  
-  if [ "$contentWidth" -gt "$width" ]
-  then
+
+  if [ "$contentWidth" -gt "$width" ]; then
     width=$contentWidth
   fi
 
   # Calculates final arm length
-  if [ "$contentWidth" -lt "$width" ]
-  then
+  if [ "$contentWidth" -lt "$width" ]; then
     local armLengths=($(calcArmLengths))
-    
+
     leftArmLength=${armLengths[0]}
     rightArmLength=${armLengths[1]}
   fi
@@ -220,8 +214,7 @@ div_calcInnerPadding() {
   local lr=$1
   local innerPadding=0
 
-  if [ "${#text}" != "0" ]
-  then
+  if [ "${#text}" != "0" ]; then
     case $lr in
       -l)
         case $justify in
@@ -251,7 +244,7 @@ div_calcInnerPadding() {
 
 calcArmLengths() {
   local lengthOfArms=$(($width - $contentWidth))
-  
+
   case $justify in
     l|left)
       rightArmLength=$lengthOfArms
@@ -276,8 +269,7 @@ div_calcVerticalPadding() {
   local upperPadding=0
   local lowerPadding=0
 
-  if [ "$contentHeight" -lt "$height" ]
-  then
+  if [ "$contentHeight" -lt "$height" ]; then
     local difference=$(($height - $contentHeight))
     upperPadding=$(divide difference)
     lowerPadding=$(divide -r difference)
@@ -290,8 +282,7 @@ div_calcArmRepCount() {
   local armRepCount=$1
   local characterCount=$2
 
-  if [ "$characterCount" -gt 1 ]
-  then
+  if [ "$characterCount" -gt 1 ]; then
     armRepCount=$(($armRepCount / $characterCount))
   fi
 
@@ -306,8 +297,7 @@ div_print() {
   out+=$(space $outerPaddingLeft)
   out+=$(echo -n "${outerEdgeLeft}")
 
-  if [ "$leftArm" = " " ]
-  then
+  if [ "$leftArm" = " " ]; then
     out+=$(space $leftArmLength)
   else
     out+=$(repeat "$leftArm" $(div_calcArmRepCount $leftArmLength ${#leftArm}))
@@ -319,8 +309,7 @@ div_print() {
   out+=$(space $innerPaddingRight)
   out+=$(echo -n "$innerEdgeRight")
 
-  if [ "$rightArm" = " " ]
-  then
+  if [ "$rightArm" = " " ]; then
     out+=$(space $rightArmLength)
   else
     out+=$(repeat "$rightArm" $(div_calcArmRepCount $rightArmLength ${#rightArm}))
@@ -330,8 +319,7 @@ div_print() {
   out+=$(space $outerPaddingRight)
   out+=$(skip $lowerPadding)
 
-  if [ "$newLine" = "1" ]
-  then
+  if [ "$newLine" = "1" ]; then
     print3 "$out"
   else
     print3 -n "$out"
@@ -340,9 +328,8 @@ div_print() {
 
 div_debug() {
   local msg="$1"
-  
-  if [ ! -z "$msg" ]
-  then
+
+  if [ ! -z "$msg" ]; then
     print4 "$msg"
   fi
 
@@ -350,7 +337,7 @@ div_debug() {
   print4 "width: $width"
 
   print4 "upperPadding: $upperPadding"
-  
+
   print4 "outerPaddingLeft: $outerPaddingLeft"
   print4 "outerEdgeLeft: ${outerEdgeLeft}"
 
@@ -371,7 +358,7 @@ div_debug() {
 
   print4 "outerEdgeRight: $outerEdgeRight"
   print4 "outerPaddingRight: $outerPaddingRight"
-  
+
   print4 "lowerPadding: $lowerPadding"
 
   print4 "newLine: $newLine"

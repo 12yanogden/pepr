@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 5/28/21
-#
+#!/bin/bash
 # Provides useful functions for array manipulation
 
 # Returns the intersect of the two arrays given
@@ -13,7 +10,7 @@ intersect() {
   local isSecondary=0
   local out=()
 
-  for arg in ${args[@]}
+  for arg in "${args[@]}"
   do
     if [ "$arg" = "^" ]
     then
@@ -50,7 +47,7 @@ subtract() {
   local secondary=()
   local isSecondary=0
 
-  for arg in ${args[@]}
+  for arg in "${args[@]}"
   do
     if [ "$arg" = "-" ]
     then
@@ -82,14 +79,14 @@ subtract() {
 # Returns the unique values of the array given
 # removeDups "${array[@]}" => "${uniques[@]}"
 removeDups() {
-  local array=($@)
+  local array=("$@")
   local uniques=()
 
-  for item in ${array[@]}
+  for item in "${array[@]}"
   do
     local isUnique=1
-    
-    for unique in ${uniques[@]}
+
+    for unique in "${uniques[@]}"
     do
       if [ "$item" = "$unique" ]
       then

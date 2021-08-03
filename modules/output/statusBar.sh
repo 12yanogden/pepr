@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 4/20/21
-#
+#!/bin/bash
 # Builds a status bar
 
 include "commands"
@@ -9,8 +6,7 @@ include "print"
 
 statusBar() {
   # Exits if printPermission is set to quiet
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -62,9 +58,8 @@ statusBar_print() {
   print3 -n $text
   space $padding
   print3 -n " ["
-  
-  if [ ! -z "$color" ]
-  then
+
+  if [ ! -z "$color" ]; then
     print3 -ne $color $status $noColor
   else
     print3 -n " $status "
@@ -75,13 +70,12 @@ statusBar_print() {
 
 statusBar_debug() {
   local msg="$1"
-  
-  if [ ! -z "$msg" ]
-  then
+
+  if [ ! -z "$msg" ]; then
     print4 "$msg"
   fi
 
-  print4 args: ${args[@]}
+  print4 args: "${args[@]}"
   print4 text: $text
   print4 status: $status
   print4 color: $color

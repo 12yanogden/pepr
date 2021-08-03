@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 4/29/21
-#
+#!/bin/bash
 # Manages data in serverConfigs
 
 include "array"
@@ -77,13 +74,13 @@ serverConfigs_getServersByFieldValues() {
   local values=()
   local isHeader=1
   local headerIndexes=()
-  
+
   #for arg in "${args[@]}"
   #do
   #done
 
-  
-  "$(($(serverConfigs_getFieldIndexByHeader $header) + 1))"
+
+  #"$(($(serverConfigs_getFieldIndexByHeader $header) + 1))"
 
   awk -F '\t' -v "headerIndex=$headerIndex" -v "value=$value" '{
     if (NR > 1 && $headerIndex == value)
@@ -117,16 +114,15 @@ serverConfigs_setFieldValueByServer() {
   local tabulatedEditConfigs=""
   local user="$(whoami)"
 
-  if [ "$user" != "psoft" -o "$user" != "root" ]
-  then
+  if [ "$user" != "psoft" -o "$user" != "root" ]; then
     echo "Must be psoft or root to modify $serverConfigs"
     return 1
   fi
 
   editConfigs[$fieldIndex]="$value"
 
-  tabulatedOriginalConfigs="$(echo ${originalConfigs[@]} | sed 's/ /\t/g')"
-  tabulatedEditConfigs="$(echo ${editConfigs[@]} | sed 's/ /\t/g')"
+  tabulatedOriginalConfigs="$(echo "${originalConfigs[@]}" | sed 's/ /\t/g')"
+  tabulatedEditConfigs="$(echo "${editConfigs[@]}" | sed 's/ /\t/g')"
 
   sed -i "s/$tabulatedOriginalConfigs/$tabulatedEditConfigs/g" $serverConfigs
 }
@@ -145,8 +141,8 @@ getAllByServer() {
     if (NR > 1 && $1 == server)
       print;
     }' $serverConfigs)")
-  
-  echo "$(echo ${all[@]} | sed 's/\t/ /g')"
+
+  echo "$(echo "${all[@]}" | sed 's/\t/ /g')"
 }
 
 # Returns the servers of the application given, excludes demo servers by default
@@ -158,14 +154,14 @@ getServersByApp() {
   local dmoServers=()
   local servers=()
 
-  for arg in ${args[@]}
+  for arg in "${args[@]}"
   do
     case "$arg" in
       --dmo)
         includeDmo="$arg"
       ;;
       *)
-        if [ "$arg" != -* ]
+        if [[ "$arg" != -* ]]
         then
           app="$(standardizeAny $arg)"
         fi
@@ -175,8 +171,7 @@ getServersByApp() {
 
   servers=($(serverConfigs_getServersByFieldValue "application" "$app"))
 
-  if [ -z "$includeDmo" ]
-  then
+  if [ -z "$includeDmo" ]; then
     dmoServers=($(serverConfigs_getServersByFieldValue "environment" "dmo"))
     servers=("$(subtract "${servers[@]}" - "${dmoServers[@]}")")
   fi
@@ -190,8 +185,7 @@ getServersByEnv() {
   local env="$1"
   local servers=($(serverConfigs_getServersByFieldValue "environment" "$env"))
 
-  if [ "$env" = "pch" ]
-  then
+  if [ "$env" = "pch" ]; then
     servers+=($(serverConfigs_getServersByFieldValue "environment" "tmpl"))
   fi
 
@@ -205,12 +199,11 @@ getServersByAppEnv() {
 
   servers=($(serverConfigs_getServersByTwoFieldValues "application" ${appAndEnv[app]} "environment" ${appAndEnv[env]}))
 
-  if [ "${appAndEnv[app]}" = "pacm" -a "${appAndEnv[env]}" = "pch" ]
-  then
+  if [ "${appAndEnv[app]}" = "pacm" -a "${appAndEnv[env]}" = "pch" ]; then
     servers+=($(serverConfigs_getServersByTwoFieldValues "application" ${appAndEnv[app]} "environment" "tmpl"))
   fi
 
-  echo ${servers[@]}
+  echo "${servers[@]}"
 }
 
 # Returns app and env of the appEnv given
@@ -221,9 +214,9 @@ calcAppAndEnvByAppEnv() {
   local envs=($(getEnvs))
   declare -A appAndEnv=([app]='' [env]='')
 
-  for app in ${apps[@]}
+  for app in "${apps[@]}"
   do
-    for env in ${envs[@]}
+    for env in "${envs[@]}"
     do
       if [ "$env" != "tmpl" ]
       then
@@ -237,8 +230,7 @@ calcAppAndEnvByAppEnv() {
     done
   done
 
-  if [ "${app}${env}" = "pacmtmpl" ]
-  then
+  if [ "${app}${env}" = "pacmtmpl" ]; then
     appAndEnv[app]="pacm"
     appAndEnv[env]="tmpl"
   fi
@@ -252,14 +244,14 @@ getServersByGroup() {
   local includeDmo=''
   local servers=()
 
-  for arg in ${args[@]}
+  for arg in "${args[@]}"
   do
     case "$arg" in
       --dmo)
         includeDmo="$arg"
       ;;
       *)
-        if [ "$arg" != -* ]
+        if [[ "$arg" != -* ]]
         then
           group="$(standardizeAny $arg)"
         fi
@@ -271,7 +263,7 @@ getServersByGroup() {
     nonprd)
       local envs=($(getEnvs))
 
-      for env in ${envs[@]}
+      for env in "${envs[@]}"
       do
         if [ "$env" != "prd" -a "$env" != "tmpl" ]
         then
@@ -297,7 +289,7 @@ getServersByGroup() {
     ;;
   esac
 
-  echo ${servers[@]}
+  echo "${servers[@]}"
 }
 
 # Returns the application of the server given
@@ -374,14 +366,12 @@ getServers() {
   local envIndex="$(($(serverConfigs_getFieldIndexByHeader "environment") + 1))"
   local servers=()
 
-  if [ -z "$includeDmo" ]
-  then
+  if [ -z "$includeDmo" ]; then
     servers=($(awk -F '\t' -v "fieldIndex=$fieldIndex" -v "envIndex=$envIndex" '{
     if (NR > 1 && $envIndex != "dmo")
       print $fieldIndex;
     }' $serverConfigs))
-  elif [ "$includeDmo" = "--dmo" ]
-  then
+  elif [ "$includeDmo" = "--dmo" ]; then
     servers=($(awk -F '\t' -v "fieldIndex=$fieldIndex" '{
     if (NR > 1)
       print $fieldIndex;
@@ -400,8 +390,8 @@ getApps() {
     if (NR > 1)
       print $fieldIndex;
     }' $serverConfigs))
-  
-  apps=($(removeDups ${apps[@]}))
+
+  apps=($(removeDups "${apps[@]}"))
 
   echo "${apps[@]}"
 }
@@ -416,7 +406,7 @@ getEnvs() {
       print $fieldIndex;
     }' $serverConfigs))
 
-  envs=($(removeDups ${envs[@]}))
+  envs=($(removeDups "${envs[@]}"))
 
   echo "${envs[@]}"
 }
@@ -428,9 +418,9 @@ getAppEnvs() {
   local envs=($(getEnvs))
   local appEnvs=()
 
-  for app in ${apps[@]}
+  for app in "${apps[@]}"
   do
-    for env in ${envs[@]}
+    for env in "${envs[@]}"
     do
       if [ "$env" != "tmpl" ]
       then
@@ -438,7 +428,7 @@ getAppEnvs() {
       fi
     done
   done
-  
+
   appEnvs+=("pacmtmpl")
 
   echo "${appEnvs[@]}"
@@ -448,7 +438,7 @@ getAppEnvs() {
 # standardizeAny "app/env/appEnv/group" => standardized "app/env/appEnv/group"
 standardizeAny() {
   local any="$@"
-    
+
   # Sets all characters to lower case
   any="$(echo "$any" | awk '{print tolower($0)}')"
 
@@ -481,7 +471,7 @@ isServer() {
   local servers=()
   local isServer=0
 
-  for arg in ${args[@]}
+  for arg in "${args[@]}"
   do
     case "$arg" in
       --dmo)
@@ -495,7 +485,7 @@ isServer() {
 
   servers=($(getServers $includeDmo))
 
-  for server in ${servers[@]}
+  for server in "${servers[@]}"
   do
     if [ "$server" = "$target" ]
     then
@@ -514,7 +504,7 @@ isApp() {
   local apps=($(getApps))
   local isApp=0
 
-  for app in ${apps[@]}
+  for app in "${apps[@]}"
   do
     if [ "$app" = "$target" ]
     then
@@ -533,7 +523,7 @@ isEnv() {
   local envs=($(getEnvs))
   local isEnv=0
 
-  for env in ${envs[@]}
+  for env in "${envs[@]}"
   do
     if [ "$env" = "$target" ]
     then
@@ -552,7 +542,7 @@ isAppEnv() {
   local appEnvs=($(getAppEnvs))
   local isAppEnv=0
 
-  for appEnv in ${appEnvs[@]}
+  for appEnv in "${appEnvs[@]}"
   do
     if [ "$appEnv" = "$target" ]
     then
@@ -569,7 +559,7 @@ isAbstract() {
   local groups=("all" "nonprd")
   local isAbstract=0
 
-  for group in ${groups[@]}
+  for group in "${groups[@]}"
   do
     if [ "$group" = "$target" ]
     then
@@ -592,7 +582,7 @@ isAny() {
   )
   local isAny=0
 
-  for validation in ${validations[@]}
+  for validation in "${validations[@]}"
   do
     if [ $($validation $target) -eq 1 ]
     then
@@ -601,7 +591,7 @@ isAny() {
     fi
   done
 
-  echo $isAny 
+  echo $isAny
 }
 
 getServerGroupType() {
@@ -615,7 +605,7 @@ getServerGroupType() {
   )
   local serverGroupType=0
 
-  for i in ${!serverGroupTypes[@]}
+  for i in "${!serverGroupTypes[@]}"
   do
     if [ $(${serverGroupTypes[i]} $target) -eq 1 ]
     then
@@ -632,7 +622,7 @@ isGateway() {
   local target="$1"
   local isGateway=0
 
-  for gatewayServer in ${gatewayServers[@]}
+  for gatewayServer in "${gatewayServers[@]}"
   do
     if [ "$gatewayServer" = "$target" ]
     then
@@ -649,7 +639,7 @@ isIntegration() {
   local target="$1"
   local isIntegration=0
 
-  for integrationServer in ${integrationServers[@]}
+  for integrationServer in "${integrationServers[@]}"
   do
     if [ "$integrationServer" = "$target" ]
     then
@@ -666,7 +656,7 @@ isJRAD() {
   local target="$1"
   local isJRAD=0
 
-  for JRADServer in ${JRADServers[@]}
+  for JRADServer in "${JRADServers[@]}"
   do
     if [ "$JRADServer" = "$target" ]
     then
@@ -683,7 +673,7 @@ hasApp() {
   local target="$1"
   local hasApp=0
 
-  for appServer in ${appServers[@]}
+  for appServer in "${appServers[@]}"
   do
     if [ "$appServer" = "$target" ]
     then
@@ -700,7 +690,7 @@ hasProcess() {
   local target="$1"
   local hasProcess=0
 
-  for prcsServer in ${prcsServers[@]}
+  for prcsServer in "${prcsServers[@]}"
   do
     if [ "$prcsServer" = "$target" ]
     then
@@ -744,20 +734,15 @@ getServersByAny() {
     esac
   done
 
-  if [ $(isServer $in $includeDmo) -eq 1 ]
-  then
+  if [ $(isServer $in $includeDmo) -eq 1 ]; then
     servers=($in)
-  elif [ $(isApp $in) -eq 1 ]
-  then
+  elif [ $(isApp $in) -eq 1 ]; then
     servers=($(getServersByApp $in $includeDmo))
-  elif [ $(isEnv $in) -eq 1 ]
-  then
+  elif [ $(isEnv $in) -eq 1 ]; then
     servers=($(getServersByEnv $in))
-  elif [ $(isAppEnv $in) -eq 1 ]
-  then
+  elif [ $(isAppEnv $in) -eq 1 ]; then
     servers=($(getServersByAppEnv $in))
-  elif [ $(isAbstract $in) -eq 1 ]
-  then
+  elif [ $(isAbstract $in) -eq 1 ]; then
     servers=($(getServersByGroup $in $includeDmo))
   fi
 
@@ -770,8 +755,7 @@ setTuxVersionByServer() {
   local server="$1"
   local version="$2"
 
-  if [[ "$version" =~ ^[0-9]{2,}(\.[0-9]{1,}){4}$ ]]
-  then
+  if [[ "$version" =~ ^[0-9]{2,}(\.[0-9]{1,}){4}$ ]]; then
     serverConfigs_setFieldValueByServer "$server" "tuxVersion" "$version"
   else
     print1 "setTuxVersionByServer: $version is an invalid version"

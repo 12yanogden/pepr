@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 9/28/20
-#
+#!/bin/bash
 # Returns message if the current user does not match the user given, else blank
 
 include "commands"
@@ -28,11 +25,9 @@ validateUser() {
     esac
   done
 
-  if [ "$expected" != "$actual" ]
-  then
+  if [ "$expected" != "$actual" ]; then
     echo "You must be logged in as $expected. You are currently logged in as $actual."
-  elif [ "$actual" = "psoft" ]
-  then
+  elif [ "$actual" = "psoft" ]; then
     psKey="/home/psoft/.ssh/phire"
   fi
 }

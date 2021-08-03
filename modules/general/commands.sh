@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 9/28/20
-#
+#!/bin/bash
 # commands.sh is meant to house often used statements.
 
 include "print"
@@ -77,11 +74,10 @@ divide() {
   done
 
   quotient=$(($dividend / $divisor))
-  
-  if [ "$includeRemainder" = "1" ]
-  then
+
+  if [ "$includeRemainder" = "1" ]; then
     local remainder=$(($dividend % $divisor))
-    
+
     quotient=$(($quotient + $remainder))
   fi
 
@@ -92,14 +88,12 @@ compareVersions() {
   local version1=$1
   local version2=$2
 
-  if [ -z "$version1" -o -z "$version2" ]
-  then
+  if [ -z "$version1" -o -z "$version2" ]; then
     echo "compareVersions: include two versions to compare"
     return 1
   fi
 
-  if [ "$version1" = "$version2" ]
-  then
+  if [ "$version1" = "$version2" ]; then
     echo 0
   else
     local lesser="$(echo -e "$version1\n$version2" | sort -V | head -n1)"

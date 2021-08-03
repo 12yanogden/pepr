@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 5/13/21
-#
+#!/bin/bash
 # Prints standardized output structures using perpendicular patterns
 
 include "block"
@@ -9,8 +6,7 @@ include "statusBar"
 
 # Prints a divider with dashed arms and crosses on either side
 crossDiv() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -19,8 +15,7 @@ crossDiv() {
 
 # Prints a crossBlock around text
 crossBlock() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -29,8 +24,7 @@ crossBlock() {
 
 # Prints a statusBar with the status of PASS
 pass() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -46,8 +40,7 @@ pass() {
     fi
   done
 
-  if [ ! -z "$colorFlagIndex" ]
-  then
+  if [ ! -z "$colorFlagIndex" ]; then
     unset 'args[colorFlagIndex]'
     statusBar "${args[@]}" -s "PASS" -c "$green"
   else
@@ -57,8 +50,7 @@ pass() {
 
 # Prints a statusBar with the status of FAILED
 fail() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -74,8 +66,7 @@ fail() {
     fi
   done
 
-  if [ ! -z "$colorFlagIndex" ]
-  then
+  if [ ! -z "$colorFlagIndex" ]; then
     unset 'args[colorFlagIndex]'
     statusBar "${args[@]}" -s "FAILED" -c "$red"
   else

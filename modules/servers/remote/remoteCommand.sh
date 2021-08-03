@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 2/17/21
-#
+#!/bin/bash
 # Runs any command on any server(s)
 
 include "crossStandard"
@@ -10,7 +7,7 @@ include "print"
 include "printWithLabel"
 
 rc() {
-  remoteCommand $@
+  remoteCommand "$@"
 }
 
 remoteCommand() {
@@ -55,7 +52,7 @@ remoteCommand() {
       -w|--width)
         i=$(($i + 1))
 
-        if [ "${args[i]}" != -* ]
+        if [[ "${args[i]}" != -* ]]
         then
           width="${args[i]}"
         fi
@@ -98,8 +95,7 @@ remoteCommand() {
 
   #--------------------------------------------- Input Validation ---------------------------------------------#
   inputValidation="$(remoteCommand_validateInput)"
-  if [ ! -z "$inputValidation" ]
-  then
+  if [ ! -z "$inputValidation" ]; then
     fail "remoteCommand: $inputValidation" -w $width
     printPermission=$printPermissionCache
     return 1
@@ -125,7 +121,7 @@ remoteCommand() {
       echo "$targetServer:" &>> $log
 
       if [ "$user" = "psoft" ]
-      then 
+      then
         nohup ssh -q -p22222 -oLogLevel=error $user@$targetServer -oIdentityFile=$psKey "$command" &>> $log
       else
         nohup ssh -q -p22222 -oLogLevel=error $user@$targetServer "$command" &>> $log
@@ -150,7 +146,7 @@ remoteCommand_validateInput() {
   )
   local inputValidation=''
 
-  for validation in ${validations[@]}
+  for validation in "${validations[@]}"
   do
     inputValidation="$($validation)"
 
@@ -166,8 +162,7 @@ remoteCommand_validateInput() {
 remoteCommand_validateTargetServers() {
   local targetServersValidation=''
 
-  if [ ${#targetServers[@]} -eq 0 ]
-  then
+  if [ ${#targetServers[@]} -eq 0 ]; then
     targetServersValidation="please include a valid target server"
   fi
 
@@ -177,8 +172,7 @@ remoteCommand_validateTargetServers() {
 remoteCommand_validateCommand() {
   local commandValidation=''
 
-  if [ -z "$command" ]
-  then
+  if [ -z "$command" ]; then
     commandValidation="please include a command"
   fi
 
@@ -196,8 +190,7 @@ remoteCommand_print() {
   local returnCode=$2
   local out=''
 
-  if [ $outOnly -eq 1 ]
-  then
+  if [ $outOnly -eq 1 ]; then
     out="$result"
   else
     if [ $printServers -eq 1 -a ${#targetServers[@]} -gt 1 ]
@@ -269,9 +262,8 @@ remoteCommand_help() {
 
 remoteCommand_debug() {
   local msg="$1"
-  
-  if [ ! -z "$msg" ]
-  then
+
+  if [ ! -z "$msg" ]; then
     print4 "$msg"
   fi
 
@@ -279,7 +271,7 @@ remoteCommand_debug() {
   print4 isParallel: $isParallel
   print4 user: $user
   print4 psKey: $psKey
-  print4 targetServers: ${targetServers[@]}
+  print4 targetServers: "${targetServers[@]}"
   print4 targetServer: $targetServer
   print4 ""
 }

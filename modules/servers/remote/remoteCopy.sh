@@ -1,8 +1,5 @@
-# Created:
-# by Ryan Ogden
-# on 2/17/21
-#
-# Copies any file or directory from the source server to the destination servers given 
+#!/bin/bash
+# Copies any file or directory from the source server to the destination servers given
 # remoteCopy "sourcePath" -ts "targetServer(s)"
 # remoteCopy "sourcePath" -ss "sourceServer"
 
@@ -11,7 +8,7 @@ include "serverConfigs"
 include "validateUser"
 
 rcopy() {
-  remoteCopy $@
+  remoteCopy "$@"
 }
 
 #--------------------------------------------------------------------------------------------------------------#
@@ -23,8 +20,7 @@ rcopy() {
 remoteCopy() {
   #--------------------------------------------- User Validation ----------------------------------------------#
   local userValidation=$(validateUser "psoft")
-  if [ ! -z "$userValidation" ]
-  then
+  if [ ! -z "$userValidation" ]; then
     print1 "$userValidation"
     return 1
   fi
@@ -51,7 +47,7 @@ remoteCopy() {
       -ss|--sourceServer)
         i=$(($i + 1))
 
-        if [ "${args[i]}" != -* ]
+        if [[ "${args[i]}" != -* ]]
         then
           sourceServer="${args[i]}"
         fi
@@ -78,7 +74,7 @@ remoteCopy() {
       -tp|--targetPath)
         i=$(($i + 1))
 
-        if [ "${args[i]}" != -* ]
+        if [[ "${args[i]}" != -* ]]
         then
           targetPath="${args[i]}"
         fi
@@ -98,7 +94,7 @@ remoteCopy() {
       -w|--width)
         i=$(($i + 1))
 
-        if [ "${args[i]}" != -* ]
+        if [[ "${args[i]}" != -* ]]
         then
           width="${args[i]}"
         fi
@@ -113,25 +109,22 @@ remoteCopy() {
   done
 
   #--------------------------------------------- Input Resolution ---------------------------------------------#
-  if [ ! -z "$sourcePath" -a -z "$targetPath" ]
-  then
+  if [ ! -z "$sourcePath" -a -z "$targetPath" ]; then
     targetPath="$(dirname $sourcePath)"
-  elif [ -z "$sourcePath" -a ! -z "$targetPath" ]
-  then
+  elif [ -z "$sourcePath" -a ! -z "$targetPath" ]; then
     sourcePath="$targetPath"
   fi
 
   #--------------------------------------------- Input Validation ---------------------------------------------#
   inputValidation="$(remoteCopy_validateInput)"
-  if [ ! -z "$inputValidation" ]
-  then
+  if [ ! -z "$inputValidation" ]; then
     fail "remoteCopy: $inputValidation" -w $width
     printPermission=$printPermissionCache
     return 1
   fi
 
   #----------------------------------------------- Copy Process -----------------------------------------------#
-  for targetServer in ${targetServers[@]}
+  for targetServer in "${targetServers[@]}"
   do
     if [ "$targetServer" != "$sourceServer" ]
     then
@@ -166,7 +159,7 @@ remoteCopy_validateInput() {
   )
   local inputValidation=''
 
-  for validation in ${validations[@]}
+  for validation in "${validations[@]}"
   do
     inputValidation="$("$validation")"
 
@@ -182,8 +175,7 @@ remoteCopy_validateInput() {
 remoteCopy_validateSourceServer() {
   local sourceServerValidation=''
 
-  if [ $(isServer $sourceServer) -eq 0 ]
-  then
+  if [ $(isServer $sourceServer) -eq 0 ]; then
     sourceServerValidation="$sourceServer is not a valid source server"
   fi
 
@@ -193,8 +185,7 @@ remoteCopy_validateSourceServer() {
 remoteCopy_validateTargetServers() {
   local targetServersValidation=''
 
-  if [ ${#targetServers} -eq 0 ]
-  then
+  if [ ${#targetServers} -eq 0 ]; then
     targetServersValidation="please include a valid target server"
   fi
 
@@ -204,8 +195,7 @@ remoteCopy_validateTargetServers() {
 remoteCopy_validateSourcePath() {
   local sourcePathValidation=''
 
-  if [ ! -z "$sourcePath" ]
-  then
+  if [ ! -z "$sourcePath" ]; then
     if ssh -p22222 -oLogLevel=error $user@$sourceServer -oIdentityFile=$psKey "[ ! -d $sourcePath -a ! -f $sourcePath ]" 2>/dev/null
     then
       sourcePathValidation="$sourcePath does not exist on $sourceServer"
@@ -220,9 +210,8 @@ remoteCopy_validateSourcePath() {
 remoteCopy_validateTargetPath() {
   local targetPathValidation=''
 
-  if [ ! -z "$targetPath" ]
-  then
-    for targetServer in ${targetServers[@]}
+  if [ ! -z "$targetPath" ]; then
+    for targetServer in "${targetServers[@]}"
     do
       if ssh -p22222 -oLogLevel=error $user@$targetServer -oIdentityFile=$psKey "[ ! -d $targetPath -a ! -f $targetPath ]" 2>/dev/null
       then
@@ -237,7 +226,7 @@ remoteCopy_validateTargetPath() {
 remoteCopy_validateTargetWritability() {
   local targetWritabilityValidation=''
 
-  for targetServer in ${targetServers[@]}
+  for targetServer in "${targetServers[@]}"
   do
     if ssh -p22222 -oLogLevel=error $user@$targetServer -oIdentityFile=$psKey "[ ! -w $targetPath ]" 2>/dev/null
     then
@@ -255,8 +244,7 @@ remoteCopy_validateTargetWritability() {
 #--------------------------------------------------------------------------------------------------------------#
 
 remoteCopy_localToRemote() {
-  if [ "$isParallel" -eq "0" ]
-  then
+  if [ "$isParallel" -eq "0" ]; then
     scp -rpq -P22222 -oLogLevel=ERROR -i $psKey $sourcePath $user@$targetServer:$targetPath
     remoteCopy_print $?
   else
@@ -268,8 +256,7 @@ remoteCopy_localToRemote() {
 }
 
 remoteCopy_remoteToLocal() {
-  if [ "$isParallel" -eq "0" ]
-  then
+  if [ "$isParallel" -eq "0" ]; then
     scp -rpq -P22222 -oLogLevel=ERROR -i $psKey $user@$sourceServer:$sourcePath $targetPath
     remoteCopy_print $?
   else
@@ -284,8 +271,7 @@ remoteCopy_remoteToRemote() {
   print1 "remoteCopy cannot copy from a remote server to a remote server"                                                     # FIXME
   return 1
 
-  if [ "$isParallel" -eq "0" ]
-  then
+  if [ "$isParallel" -eq "0" ]; then
     scp -rpq -P22222 -oLogLevel=ERROR -i $psKey $user@$sourceServer:$sourcePath $user@$targetServer:$targetPath
     remoteCopy_print $?
   else
@@ -307,15 +293,13 @@ remoteCopy_print() {
   local message=''
   local out=''
 
-  if [ "$(dirname $sourcePath)" = "$targetPath" ]
-  then
+  if [ "$(dirname $sourcePath)" = "$targetPath" ]; then
     message="Copy $sourceServer:$sourcePath to $targetServer"
   else
     message="Copy $sourceServer:$sourcePath to $targetServer:$targetPath"
   fi
 
-  if [ $returnCode -eq 0 ]
-  then
+  if [ $returnCode -eq 0 ]; then
     out="$(pass $message -w $width)"
   else
     out="$(fail $message -w $width)"
@@ -332,9 +316,8 @@ remoteCopy_print() {
 
 remoteCopy_debug() {
   local msg="$1"
-  
-  if [ ! -z "$msg" ]
-  then
+
+  if [ ! -z "$msg" ]; then
     print4 "$msg"
   fi
 
@@ -343,6 +326,6 @@ remoteCopy_debug() {
   print4 sourceServer: $sourceServer
   print4 sourcePath: $sourcePath
   print4 targetPath: $targetPath
-  print4 targetServers: ${targetServers[@]}
+  print4 targetServers: "${targetServers[@]}"
   print4 ""
 }

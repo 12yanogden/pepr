@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 9/28/20
-#
+#!/bin/bash
 # Builds a block around text
 #
 # +-----------------------------------------------------------+
@@ -109,9 +106,8 @@ block() {
 
 block_debug() {
   local msg="$1"
-  
-  if [ ! -z "$msg" ]
-  then
+
+  if [ ! -z "$msg" ]; then
     print4 "$msg"
   fi
 

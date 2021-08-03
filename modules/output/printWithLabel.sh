@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 5/21/21
-#
+#!/bin/bash
 # Prepends the label name to its output and prints
 
 include "commands"
@@ -16,15 +13,13 @@ printWithLabel() {
   local otherLinesIndent=$(($labelAndIndentLength % $INDENT_LENGTH))
   local out=''
 
-  if [ ${#label} -lt $INDENT_LENGTH ]
-  then
+  if [ ${#label} -lt $INDENT_LENGTH ]; then
     firstLineIndent=2
   fi
 
   out+="$label$(repeat '\t' $firstLineIndent)"
 
-  if [ $(echo "$content" | wc -l) -eq 1 ]
-  then
+  if [ $(echo "$content" | wc -l) -eq 1 ]; then
     out+="$content"
   else
     local firstLine="$(echo "$content" | head -n 1)"

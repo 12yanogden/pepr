@@ -1,7 +1,4 @@
-# Created:
-# by Ryan Ogden
-# on 1/28/21
-# 
+#!/bin/bash
 # print.sh aims to augment the echo command with prioritization of outputs for debugging.
 # Requires that the calling script sets the printPermission variable.
 
@@ -10,8 +7,7 @@ printPermission=3
 
 # Print errors
 print1() {
-  if [ ! -z "$printPermission" ]
-  then
+  if [ ! -z "$printPermission" ]; then
     if [ $printPermission -ge 1 ]
     then
       printEcho "$@"
@@ -21,8 +17,7 @@ print1() {
 
 # Print warnings
 print2() {
-  if [ ! -z "$printPermission" ]
-  then
+  if [ ! -z "$printPermission" ]; then
     if [ $printPermission -ge 2 ]
     then
       printEcho "$@"
@@ -32,8 +27,7 @@ print2() {
 
 # Print info
 print3() {
-  if [ ! -z "$printPermission" ]
-  then
+  if [ ! -z "$printPermission" ]; then
     if [ $printPermission -ge 3 ]
     then
       printEcho "$@"
@@ -43,8 +37,7 @@ print3() {
 
 # Print debug
 print4() {
-  if [ ! -z "$printPermission" ]
-  then
+  if [ ! -z "$printPermission" ]; then
     if [ "$printPermission" = "4" ]
     then
       printEcho "$@"
@@ -85,31 +78,27 @@ printEcho() {
     esac
   done
 
-  if [ $indent -gt 0 ]
-  then
+  if [ $indent -gt 0 ]; then
     indentPrefix="$(print_calcIndentPrefix)"
   fi
 
   indentLength=$(($(echo "$indentPrefix" | wc -c) - 1))
 
   inputValidation="$(print_validateInput)"
-  if [ ! -z "$inputValidation" ]
-  then
+  if [ ! -z "$inputValidation" ]; then
     echo "print: $inputValidation"
     return 1
   fi
 
-  if [ ! -z "$width" ]
-  then
+  if [ ! -z "$width" ]; then
     out=("$(print_applyWidth)")
   fi
 
-  if [ $indent -gt 0 ]
-  then
+  if [ $indent -gt 0 ]; then
     out=("$(print_insertIndentPrefix)")
   fi
 
-  echo ${flags[@]} "${out[@]}"
+  echo "${flags[@]}" "${out[@]}"
 }
 
 print_calcIndentPrefix() {
@@ -126,8 +115,7 @@ print_calcIndentPrefix() {
 print_validateInput() {
   local inputValidation=''
 
-  if [ ! -z $width ]
-  then
+  if [ ! -z $width ]; then
     if [ $width -le $indentLength ]
     then
       inputValidation="width must be greater than the indent"
@@ -151,4 +139,3 @@ print_insertIndentPrefix() {
 
   echo "${out[@]}"
 }
-

@@ -1,13 +1,9 @@
-# Created:
-# by Ryan Ogden
-# on 5/13/21
-#
+#!/bin/bash
 # Prints standardized output structures using hashes
 
 # Prints a divider with dashed arms and hashes on either side
 hashDiv() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
@@ -16,8 +12,7 @@ hashDiv() {
 
 # Prints a hashBlock around text
 hashBlock() {
-  if [ $printPermission -eq 0 ]
-  then
+  if [ $printPermission -eq 0 ]; then
     return 0
   fi
 
