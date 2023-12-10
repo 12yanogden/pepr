@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/12yanogden/tester/cat"
+	"github.com/12yanogden/pepr/cat"
 )
 
 func main() {
